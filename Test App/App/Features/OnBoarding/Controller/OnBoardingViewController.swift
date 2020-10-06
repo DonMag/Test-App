@@ -89,15 +89,21 @@ class OnBoardingViewController: UIViewController {
         super.viewDidLoad()
         configureView()
     }
-    
+
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		collectionView.scrollToItem(at: IndexPath(item: 4000, section: 0),
+									at: .left, animated: false)
+		self.pageControl.setCurrentItem(index: 0)
+	}
     
     // MARK: - Methods
     
     func configureView() {
         layoutSubViews()
         
-        configureScrolling()
-    }
+        //configureScrolling()
+	}
     
     public func configureScrolling() {
         configureBoundaries()
@@ -173,6 +179,7 @@ class OnBoardingViewController: UIViewController {
     
     @objc
     fileprivate func advanceTapped() {
+		
         currentIndex += 1
         let indexPath = IndexPath(row: currentIndex,
                                   section: 0)
@@ -196,7 +203,9 @@ class OnBoardingViewController: UIViewController {
 extension OnBoardingViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        return itemsWithBoundries.count
+		
+		return 10000
+        //return itemsWithBoundries.count
         //return viewModel.pages.count
     }
     
@@ -208,8 +217,11 @@ extension OnBoardingViewController: UICollectionViewDataSource {
                 for: indexPath) as? OnBoardingItemView
         else { return UICollectionViewCell() }
         
-		print(indexPath)
-        cell.configureView(with: itemsWithBoundries[indexPath.row])
+		let idx = indexPath.item % viewModel.pages.count
+		print(idx, indexPath, viewModel.pages[idx].title)
+		cell.configureView(with: viewModel.pages[idx])
+		
+        //cell.configureView(with: itemsWithBoundries[indexPath.row])
         //cell.configureView(with: viewModel.pages[indexPath.row])
         
         return cell
@@ -229,9 +241,21 @@ extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
 extension OnBoardingViewController: UIScrollViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
-		return()
         // Handle the infinite scrolling - Works Perfect
-        
+
+		let width = scrollView.frame.size.width
+		let x = scrollView.contentOffset.x
+		//let page = min(Int(round(x / width)), viewModel.pages.count)
+		let item = Int(round(x / width))
+		let page = item % viewModel.pages.count
+		print(item, page, #function)
+		stylePageControlPerPage(page: page)
+		currentIndex = item
+		pageControl.setCurrentItem(index: CGFloat(page))
+
+		return()
+		
+		/*
         let contentOffsetValue = scrollView.contentOffset.x
         if contentOffsetValue >= collectionView.contentSize.width - collectionView.frame.width {
             scrollView.contentOffset = CGPoint(x: collectionView.frame.width, y: 0)
@@ -256,5 +280,6 @@ extension OnBoardingViewController: UIScrollViewDelegate {
         
         let offset = scrollView.contentOffset.x
         pageControl.setCurrentItem(index: offset / width)
+		*/
     }
 }
