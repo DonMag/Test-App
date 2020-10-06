@@ -90,9 +90,11 @@ class OnBoardingViewController: UIViewController {
         configureView()
     }
 
+	// we're going to set collection view number of items to 10,000
+	//	so start at item 5,000
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		collectionView.scrollToItem(at: IndexPath(item: 4000, section: 0),
+		collectionView.scrollToItem(at: IndexPath(item: 5000, section: 0),
 									at: .left, animated: false)
 		self.pageControl.setCurrentItem(index: 0)
 	}
@@ -100,50 +102,13 @@ class OnBoardingViewController: UIViewController {
     // MARK: - Methods
     
     func configureView() {
-        layoutSubViews()
-        
-        //configureScrolling()
+		// confusing to use layoutSubViews() (too close to layoutSubviews())
+		//layoutSubViews()
+		// so I changed it...
+		layoutUIElements()
 	}
     
-    public func configureScrolling() {
-        configureBoundaries()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-            self.collectionView.reloadData()
-            self.scroll(toElementAtIndex: 0)
-            self.pageControl.setCurrentItem(index: 0)
-        }
-    }
-    
-    private func configureBoundaries() {
-        itemsWithBoundries = viewModel.pages
-        addLeadingItems()
-        addTrailingItems()
-    }
-    
-    private func addLeadingItems() {
-        for index in stride(from: numberOfElements, to: 0, by: -1) {
-            let indexToAdd = (viewModel.pages.count - 1) -
-                ((numberOfElements - index) % viewModel.pages.count)
-            let data = viewModel.pages[indexToAdd]
-            itemsWithBoundries.insert(data, at: 0)
-        }
-    }
-    
-    private func addTrailingItems() {
-        for index in 0..<numberOfElements {
-            let data = viewModel.pages[index % viewModel.pages.count]
-            itemsWithBoundries.append(data)
-        }
-    }
-    
-    public func scroll(toElementAtIndex index: Int) {
-        let indexPath = IndexPath(item: index + numberOfElements,
-                                  section: 0)
-        collectionView.scrollToItem(at: indexPath,
-                                    at: .left, animated: false)
-    }
-    
-    private func layoutSubViews() {
+    private func layoutUIElements() {
         
         collectionView
             .layout
@@ -205,9 +170,8 @@ extension OnBoardingViewController: UICollectionViewDataSource {
                         numberOfItemsInSection section: Int) -> Int {
 		
 		return 10000
-        //return itemsWithBoundries.count
-        //return viewModel.pages.count
-    }
+
+	}
     
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -216,14 +180,14 @@ extension OnBoardingViewController: UICollectionViewDataSource {
                 withReuseIdentifier: reuseIdentifier,
                 for: indexPath) as? OnBoardingItemView
         else { return UICollectionViewCell() }
-        
+
+		// we are using 10,000 items, but only 4 "pages"
+		//	so we cycle through them
+		
 		let idx = indexPath.item % viewModel.pages.count
-		print(idx, indexPath, viewModel.pages[idx].title)
+		
 		cell.configureView(with: viewModel.pages[idx])
 		
-        //cell.configureView(with: itemsWithBoundries[indexPath.row])
-        //cell.configureView(with: viewModel.pages[indexPath.row])
-        
         return cell
     }
 }
@@ -241,45 +205,21 @@ extension OnBoardingViewController: UICollectionViewDelegateFlowLayout {
 extension OnBoardingViewController: UIScrollViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
-        // Handle the infinite scrolling - Works Perfect
-
 		let width = scrollView.frame.size.width
 		let x = scrollView.contentOffset.x
-		//let page = min(Int(round(x / width)), viewModel.pages.count)
+		
+		// the current cell / item number in the collection view
 		let item = Int(round(x / width))
+		
+		// the page based on cell / item number
 		let page = item % viewModel.pages.count
-		print(item, page, #function)
+		
 		stylePageControlPerPage(page: page)
-		currentIndex = item
+
 		pageControl.setCurrentItem(index: CGFloat(page))
 
-		return()
-		
-		/*
-        let contentOffsetValue = scrollView.contentOffset.x
-        if contentOffsetValue >= collectionView.contentSize.width - collectionView.frame.width {
-            scrollView.contentOffset = CGPoint(x: collectionView.frame.width, y: 0)
-        } else if contentOffsetValue <= 0 {
-            let boundaryLessSize = CGFloat(viewModel.pages.count) *
-                collectionView.bounds.size.width + CGFloat(viewModel.pages.count) - 5
-            scrollView.contentOffset = CGPoint(x: boundaryLessSize, y: 0)
-        }
-        
-        
-        // Handle Check if Halfway into the next page and layout correctly - Works Perfect
-        
-        let width = scrollView.frame.size.width
-        let x = scrollView.contentOffset.x
-        let page = min(Int(round(x / width)), viewModel.pages.count)
-        stylePageControlPerPage(page: page)
-        currentIndex = page
-        
-        
-        // THE ISSUE IS HERE: Handle Page Control Transition - Not Workin
-        // This used to work perfectly when it was only 4 pages exactly
-        
-        let offset = scrollView.contentOffset.x
-        pageControl.setCurrentItem(index: offset / width)
-		*/
+		// update currentIndex (for the next button)
+		currentIndex = item
+
     }
 }
