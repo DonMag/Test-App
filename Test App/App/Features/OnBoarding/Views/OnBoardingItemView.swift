@@ -77,7 +77,7 @@ class OnBoardingItemView: UICollectionViewCell {
         stackView.addArrangedSubview(titleLabel)
         stackView.addArrangedSubview(imageView)
         stackView.addArrangedSubview(descriptionLabel)
-        addSubview(stackView)
+		contentView.addSubview(stackView)
         
         stackView
             .layout
@@ -97,6 +97,9 @@ class OnBoardingItemView: UICollectionViewCell {
         descriptionLabel
             .layout
             .width(320)
+		
+		contentView.layer.borderWidth = 1
+		contentView.layer.borderColor = UIColor.red.cgColor
     }
 
     func configureView(with page: Page) {
