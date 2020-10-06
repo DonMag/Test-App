@@ -94,7 +94,9 @@ class OnBoardingViewController: UIViewController {
 	//	so start at item 5,000
 	override func viewDidAppear(_ animated: Bool) {
 		super.viewDidAppear(animated)
-		collectionView.scrollToItem(at: IndexPath(item: 5000, section: 0),
+		// start at an index evenly divisible by number of "pages"
+		let startItem = 5000 - (5000 % viewModel.pages.count)
+		collectionView.scrollToItem(at: IndexPath(item: startItem, section: 0),
 									at: .left, animated: false)
 		self.pageControl.setCurrentItem(index: 0)
 	}

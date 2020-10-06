@@ -40,6 +40,29 @@ class OnBoardingViewModel: OnBoardingViewModelType {
                           image: #imageLiteral(resourceName: "Info"),
                           description: "ONBOARDING.04.DESCRIPTION".localized)
         
-        return [page_1, page_2, page_3, page_4]
+		// for testing variable number of pages
+		let page_5 = Page(id: 4,
+						  title: "ONBOARDING.05.TITLE".localized,
+						  color: .yellow,
+						  image: #imageLiteral(resourceName: "Info"),
+						  description: "ONBOARDING.05.DESCRIPTION".localized)
+		
+		let page_6 = Page(id: 5,
+						  title: "ONBOARDING.06.TITLE".localized,
+						  color: .green,
+						  image: #imageLiteral(resourceName: "Info"),
+						  description: "ONBOARDING.06.DESCRIPTION".localized)
+		
+		let page_7 = Page(id: 6,
+						  title: "ONBOARDING.07.TITLE".localized,
+						  color: .cyan,
+						  image: #imageLiteral(resourceName: "Info"),
+						  description: "ONBOARDING.07.DESCRIPTION".localized)
+
+		// to test 7 pages
+		//return [page_1, page_2, page_3, page_4, page_5, page_6, page_7]
+		
+		return [page_1, page_2, page_3, page_4]
+
     }()
 }
